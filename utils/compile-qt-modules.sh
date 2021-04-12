@@ -50,8 +50,8 @@ EOL
 }
 
 function build_qtbase() {
-    export CROSS_COMPILE=$ROOT/raspi/${LINARO_BASENAME}/bin/arm-linux-gnueabihf-
-    export SYSROOT=$ROOT/raspbian/sysroot
+    #export CROSS_COMPILE=$ROOT/raspi/${LINARO_BASENAME}/bin/arm-linux-gnueabihf-
+    #export SYSROOT=$ROOT/raspbian/sysroot
     MODULE='qtbase'
 
     if [[ $CLEAN_MODULES_REPO ]]; then
@@ -66,19 +66,16 @@ function build_qtbase() {
         NO_USE_GOLD_LINKER='-no-use-gold-linker'
     fi
 
-    ./configure -release -opengl es2 -device $TARGET_DEVICE \
-        -device-option CROSS_COMPILE=$CROSS_COMPILE \
-        -sysroot $SYSROOT \
+    ./configure -release -opengl es2 -eglfs -device $TARGET_DEVICE \
         -opensource -confirm-license -make libs \
+	-nomake examples \
+	-nomake tests \
         -prefix /usr/local/qt5pi \
-        -extprefix $OUTPUT_DIR \
-        -hostprefix $OUTPUT_HOST_DIR \
         $NO_USE_GOLD_LINKER \
         |& tee $ROOT/logs/$MODULE.log
 
     make_cmd $MODULE
     make install
-    ln -sf $OUTPUT_HOST_DIR/bin/qmake $ROOT/bin/qmake-qtrpi
 }
 
 # Parse arguments
@@ -111,8 +108,8 @@ echo $CLEAN_MODULES_REPO
 
 if [[ $CLEAN_OUTPUT ]]; then
     message 'Clean output directory...'
-    rm -rf $OUTPUT_HOST_DIR/*
-    rm -rf $OUTPUT_DIR/*
+    #rm -rf $OUTPUT_HOST_DIR/*
+    #rm -rf $OUTPUT_DIR/*
 fi
 
 for MODULE in "${QT_MODULES[@]}" ; do

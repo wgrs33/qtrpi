@@ -1,4 +1,4 @@
-FROM debian:stable-slim
+FROM --platform=linux/arm/v7hf balenalib/rpi-raspbian:buster
 LABEL maintainer="Patrick Wagner <patrick.richard.wagner@gmail.com>" 
 
 # install necessary packages
@@ -8,6 +8,8 @@ RUN apt-get update -q && apt-get install -yq --no-install-recommends \
     curl \
     git \
     unzip \
+    rsync \
+    wget \
     && rm -rf /var/lib/apt/lists/*
 
 # Clone Qtrpi and additional scripts
@@ -23,9 +25,7 @@ ENV QTRPI_QT_VERSION='5.15.2' \
 WORKDIR /qtrpi
 
 # Execute init script and clean up after it
-RUN ./init-qtrpi-full.sh && \
-    rm /opt/qtrpi/*.img && \
-    rm -rf /opt/qtrpi/raspi/*.tar.xz
+RUN ./init-qtrpi-full.sh
 
 # Extend path
 ENV PATH=/opt/qtrpi/bin:$PATH
